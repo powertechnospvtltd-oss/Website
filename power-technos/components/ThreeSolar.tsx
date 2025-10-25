@@ -1,29 +1,37 @@
 "use client";
-import type { JSX } from "react";
+
 import { Canvas, useFrame } from "@react-three/fiber";
+import type { ThreeElements } from "@react-three/fiber";
 import { Environment, Float, OrbitControls, Html } from "@react-three/drei";
 import * as THREE from "three";
-import { useMemo, useRef } from "react";
+import { useEffect, useMemo, useRef } from "react";
 
-function SolarTiles(props: JSX.IntrinsicElements["group"]) {
+function SolarTiles(props: ThreeElements["group"]) {
   // A simple 4x4 grid of blue tiles
   const tiles = useMemo(() => {
-    const g = new THREE.InstancedMesh(new THREE.BoxGeometry(1, 0.05, 1.4), new THREE.MeshStandardMaterial({
-      color: "#0D47A1",
-      metalness: 0.1,
-      roughness: 0.35,
-    }), 16);
+    const mesh = new THREE.InstancedMesh(
+      new THREE.BoxGeometry(1, 0.05, 1.4),
+      new THREE.MeshStandardMaterial({
+        color: "#0D47A1",
+        metalness: 0.1,
+        roughness: 0.35,
+      }),
+      16
+    );
     let i = 0;
     for (let x = 0; x < 4; x++) {
       for (let y = 0; y < 4; y++) {
         const m = new THREE.Matrix4();
         m.makeTranslation((x - 1.5) * 1.05, 0, (y - 1.5) * 1.55);
-        g.setMatrixAt(i++, m);
+        mesh.setMatrixAt(i++, m);
       }
     }
-    g.instanceMatrix.needsUpdate = true;
-    return g;
+    mesh.instanceMatrix.needsUpdate = true;
+    return mesh;
   }, []);
+
+  // Clean up GPU resources on unmount
+  useEffect(() => () => tiles.dispose(), [tiles]);
 
   return <primitive object={tiles} {...props} />;
 }
@@ -55,8 +63,14 @@ function SolarPanel() {
         <boxGeometry args={[0.35, 0.55, 0.1]} />
         <meshStandardMaterial color="black" />
       </mesh>
-      <mesh position={[4.1, 0.25, 1.7]}><boxGeometry args={[0.06, 0.25, 0.06]} /><meshStandardMaterial color="black" /></mesh>
-      <mesh position={[4.1, 0.0, 1.7]}><boxGeometry args={[0.06, 0.25, 0.06]} /><meshStandardMaterial color="black" /></mesh>
+      <mesh position={[4.1, 0.25, 1.7]}>
+        <boxGeometry args={[0.06, 0.25, 0.06]} />
+        <meshStandardMaterial color="black" />
+      </mesh>
+      <mesh position={[4.1, 0.0, 1.7]}>
+        <boxGeometry args={[0.06, 0.25, 0.06]} />
+        <meshStandardMaterial color="black" />
+      </mesh>
     </group>
   );
 }
