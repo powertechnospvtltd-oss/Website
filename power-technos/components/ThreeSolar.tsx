@@ -1,4 +1,5 @@
 "use client";
+import type { JSX } from "react";
 import { Canvas, useFrame } from "@react-three/fiber";
 import { Environment, Float, OrbitControls, Html } from "@react-three/drei";
 import * as THREE from "three";
